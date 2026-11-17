@@ -1,0 +1,4 @@
+project_id = "wayfarer"
+[functions.generate-itinerary]
+verify_jwt = false
+# The function validates the bearer token with Supabase Auth before any data access.

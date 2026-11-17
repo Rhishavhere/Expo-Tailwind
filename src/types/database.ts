@@ -1,0 +1,37 @@
+export type Profile = { id: string; username: string | null; display_name: string; avatar_url: string | null; bio: string | null; interests: string[]; default_currency: string; created_at: string; updated_at: string };
+export type Destination = { id: string; name: string; slug: string; country: string; region: string; description: string; hero_image_url: string; best_time_text: string; tips: string; budget_min_minor: number; budget_max_minor: number; currency: string; tags: string[]; latitude: number; longitude: number; is_published: boolean; created_at: string };
+export type Place = { id: string; destination_id: string; name: string; category: string; description: string; address: string; image_url: string; latitude: number | null; longitude: number | null; estimated_cost_minor: number; currency: string; tags: string[]; source_label: string; is_published: boolean; created_at: string };
+export type Trip = { id: string; created_by: string; name: string; destination_id: string; description: string; start_date: string; end_date: string; currency: string; target_budget_minor: number | null; budget_scope: 'per_person' | 'group_total'; cover_image_url: string | null; status: string; created_at: string; updated_at: string; deleted_at: string | null };
+export type Member = { id: string; trip_id: string; user_id: string; role: string; joined_at: string };
+export type Invitation = { id: string; trip_id: string; inviter_id: string; invitee_id: string; status: string; token: string; created_at: string };
+export type Item = { id: string; trip_id: string; day_date: string; place_id: string | null; title: string; description: string; category: string; start_time: string | null; end_time: string | null; estimated_cost_minor: number; currency: string; status: string; sort_order: number; created_by: string; created_at: string; updated_at: string };
+export type Vote = { id: string; itinerary_item_id: string; trip_id: string; user_id: string; value: number };
+export type Comment = { id: string; trip_id: string; itinerary_item_id: string | null; user_id: string; body: string; created_at: string };
+export type Expense = { id: string; trip_id: string; title: string; category: string; amount_minor: number; currency: string; paid_by: string; expense_date: string; note: string; created_by: string; created_at: string; updated_at: string };
+export type Split = { expense_id: string; user_id: string; share_minor: number };
+export type Saved = { id: string; user_id: string; place_id: string | null; destination_id: string | null; created_at: string };
+export type Activity = { id: string; trip_id: string; actor_id: string; summary: string; created_at: string };
+type Tables = { profiles: Profile; destinations: Destination; places: Place; trips: Trip; trip_members: Member; trip_invitations: Invitation; itinerary_items: Item; itinerary_votes: Vote; itinerary_comments: Comment; expenses: Expense; expense_splits: Split; saved_places: Saved; trip_activity: Activity };
+type Table<T> = { Row: T; Insert: Partial<T>; Update: Partial<T>; Relationships: [] };
+type Rpc<A, R> = { Args: A; Returns: R };
+export type Database = { public: {
+  Tables: { [K in keyof Tables]: Table<Tables[K]> };
+  Views: { [_ in never]: never };
+  Functions: {
+    ensure_profile: Rpc<Record<string, never>, Profile>;
+    move_item: Rpc<{item_id:string;direction:number;expected:string},undefined>;
+    vote_item: Rpc<{item_id:string;vote_value:number},undefined>;
+    save_trip: Rpc<{input:Record<string,unknown>},undefined>;
+    edit_trip_dates: Rpc<{ target_trip: string; first_day: string; last_day: string }, undefined>;
+    create_trip_with_owner: Rpc<{ input: Record<string, unknown> }, string>;
+    search_users: Rpc<{ term: string }, Profile[]>;
+    invite_to_trip: Rpc<{ target_trip: string; target_user: string }, string>;
+    respond_invitation: Rpc<{ invitation_id: string; accept: boolean }, undefined>;
+    revoke_invitation: Rpc<{ invitation_id: string }, undefined>;
+    remove_trip_member: Rpc<{ target_trip: string; target_user: string }, undefined>;
+    save_expense: Rpc<{ input: Record<string, unknown> }, string>;
+    apply_itinerary: Rpc<{ target_trip: string; suggestions: Record<string, unknown>[] }, undefined>;
+  };
+  Enums: { [_ in never]: never };
+  CompositeTypes: { [_ in never]: never };
+} };
